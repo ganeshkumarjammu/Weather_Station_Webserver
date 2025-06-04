@@ -1,9 +1,9 @@
 #include <Wire.h>
 #include <WiFi.h>
 #include <WebServer.h>
-#include <Adafruit_SSD1306.h>
+#include <Adafruit_SSD1306.h>  
 #include <Adafruit_BMP085.h>  // For BMP180
-#include <DHT.h>
+#include <DHT.h> //DHT Sensor library by Adafruit
 
 // WiFi credentials
 const char* ssid = "G";      // Replace with your WiFi SSID
@@ -70,7 +70,9 @@ void setup() {
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
-  display.setCursor(0, 0);
+  display.setCursor(3, 0);
+  display.println("IOT Weather Station");
+  display.println("--------------------");
   display.println(WiFi.localIP());
   display.display();
   delay(2000);
