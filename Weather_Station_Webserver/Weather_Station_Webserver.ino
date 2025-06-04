@@ -144,11 +144,6 @@ void handleRoot() {
       .container { padding: 15px; }
     }
   </style>
-  <script>
-    setInterval(function() {
-      location.reload();
-    }, 2000); // Refresh every 2 seconds
-  </script>
 </head>
 <body>
   <div style="height: 20vh;"></div> <!-- Top 20% space -->
