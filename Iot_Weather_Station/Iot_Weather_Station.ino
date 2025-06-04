@@ -78,23 +78,6 @@ void setup() {
   server.on("/", handleRoot);
   server.begin();
   Serial.println("Web server started");
-
-  // Check I2C devices
-  // int deviceCount = checkI2CDevices();
-  // if (deviceCount >= 2) {
-  //   Serial.println("Two or more I2C devices detected. Proceeding...");
-  //   display.clearDisplay();
-  //   display.setCursor(0, 0);
-  //   display.println(F("I2C Check: OK"));
-  //   display.display();
-  // } else {
-  //   Serial.println("Error: Fewer than two I2C devices detected. Check wiring!");
-  //   display.clearDisplay();
-  //   display.setCursor(0, 0);
-  //   display.println(F("I2C Error: <2 devices"));
-  //   display.display();
-  //   while (1);
-  // }
 }
 
 void loop() {
@@ -103,31 +86,6 @@ void loop() {
   delay(2000);            // Update every 2 seconds
 }
 
-// Function to check I2C devices and return count
-int checkI2CDevices() {
-  int deviceCount = 0;
-  i2cAddresses = "";  // Reset address string for web server
-  
-  Serial.println("Scanning for I2C devices...");
-  for (byte address = 0x03; address <= 0x77; address++) {
-    Wire.beginTransmission(address);
-    byte error = Wire.endTransmission();
-    
-    if (error == 0) {  // Device responded (ACK)
-      Serial.print("I2C device found at address 0x");
-      if (address < 16) Serial.print("0");
-      Serial.println(address, HEX);
-      i2cAddresses += "0x";
-      if (address < 16) i2cAddresses += "0";
-      i2cAddresses += String(address, HEX) + "<br>";
-      deviceCount++;
-    }
-  }
-  
-  Serial.print("Total I2C devices detected: ");
-  Serial.println(deviceCount);
-  return deviceCount;
-}
 
 // Web server root page with beautiful, mobile-friendly design
 void handleRoot() {
@@ -184,6 +142,11 @@ void handleRoot() {
       .container { padding: 15px; }
     }
   </style>
+  <script>
+    setInterval(function() {
+      location.reload();
+    }, 2000); // Refresh every 2 seconds
+  </script>
 </head>
 <body>
   <div style="height: 20vh;"></div> <!-- Top 20% space -->
@@ -193,15 +156,11 @@ void handleRoot() {
     <p>BMP180 Temperature:  )rawliteral" + String(bmp.readTemperature()) + R"rawliteral( °C </p>
     <p>BMP180 Pressure   :  )rawliteral" + String(bmp.readPressure() / 100.0) + R"rawliteral( hPa</p>
     <p>BMP180 Altitude   :  )rawliteral" + String(bmp.readAltitude() ) + R"rawliteral( m</p>)rawliteral";
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
-  // if (isnan(h) || isnan(t)) {
-  //   html += "<p>DHT11 Error: Failed to read</p>";
-  // } else {
+    float h = dht.readHumidity();
+    float t = dht.readTemperature();
     html += "<p>DHT11 Temperature : " + String(t) + " °C</p>";
     html += "<p>DHT11 Humidity    : " + String(h) + " %</p>";
-  // }
-  html += R"rawliteral(
+    html += R"rawliteral(
   </div>
   <div style="height: 30vh;"></div> <!-- Bottom 30% space -->
 </body>
@@ -224,12 +183,7 @@ void updateSensorDisplay() {
   display.print(F("BMP Temp: ")); display.print(bmpTemp); display.println(F(" C"));
   display.print(F("Pressure: ")); display.print(pressure); display.println(F(" hPa"));
   display.print(F("Altitude: ")); display.print(pressure); display.println(F(" m"));
- // display.println(F("DHT11:"));
-  // if (isnan(dhtTemp) || isnan(humidity)) {
-  //   display.println(F("DHT11 Error"));
-  // } else {
   display.print(F("DHT Temp: ")); display.print(dhtTemp); display.println(F(" C"));
   display.print(F("DHT Hum: ")); display.print(humidity); display.println(F(" %"));
-  //}
   display.display();
 }
