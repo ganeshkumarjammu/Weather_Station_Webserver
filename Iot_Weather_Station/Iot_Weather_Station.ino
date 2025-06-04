@@ -50,7 +50,6 @@ void loop() {
   // Check if readings are valid
   if (isnan(humidity) || isnan(dhtTemp)) {
     Serial.println("Failed to read from DHT11 sensor!");
-    return;
   }
   
   // Display on OLED
