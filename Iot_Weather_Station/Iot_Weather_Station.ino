@@ -22,7 +22,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Adafruit_BMP085 bmp;
 
 // DHT11 configuration (Digital)
-#define DHTPIN 4        // GPIO 4 for DHT11
+#define DHTPIN 12        // GPIO 4 for DHT11
 #define DHTTYPE DHT11   // Define DHT11 sensor type
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -67,7 +67,13 @@ void setup() {
   }
   Serial.println("\nWiFi connected. IP address: ");
   Serial.println(WiFi.localIP());
-
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.println(WiFi.localIP());
+  display.display();
+  delay(2000);
   // Set up web server routes
   server.on("/", handleRoot);
   server.begin();
@@ -180,25 +186,24 @@ void handleRoot() {
   </style>
 </head>
 <body>
-  <div style="height: 25vh;"></div> <!-- Top 25% space -->
+  <div style="height: 20vh;"></div> <!-- Top 20% space -->
   <div class="container">
-    <h1>ESP32 Sensor Dashboard</h1>
-    <h2>I2C Devices</h2>
-    <p>)rawliteral" + i2cAddresses + R"rawliteral(</p>
+    <h1>IoT Weather Station</h1>
     <h2>Sensor Readings</h2>
-    <p>BMP180 Temperature: )rawliteral" + String(bmp.readTemperature()) + R"rawliteral( °C</p>
-    <p>BMP180 Pressure: )rawliteral" + String(bmp.readPressure() / 100.0) + R"rawliteral( hPa</p>)rawliteral";
+    <p>BMP180 Temperature:  )rawliteral" + String(bmp.readTemperature()) + R"rawliteral( °C </p>
+    <p>BMP180 Pressure   :  )rawliteral" + String(bmp.readPressure() / 100.0) + R"rawliteral( hPa</p>
+    <p>BMP180 Altitude   :  )rawliteral" + String(bmp.readAltitude() ) + R"rawliteral( m</p>)rawliteral";
   float h = dht.readHumidity();
   float t = dht.readTemperature();
-  if (isnan(h) || isnan(t)) {
-    html += "<p>DHT11 Error: Failed to read</p>";
-  } else {
-    html += "<p>DHT11 Temperature: " + String(t) + " °C</p>";
-    html += "<p>DHT11 Humidity: " + String(h) + " %</p>";
-  }
+  // if (isnan(h) || isnan(t)) {
+  //   html += "<p>DHT11 Error: Failed to read</p>";
+  // } else {
+    html += "<p>DHT11 Temperature : " + String(t) + " °C</p>";
+    html += "<p>DHT11 Humidity    : " + String(h) + " %</p>";
+  // }
   html += R"rawliteral(
   </div>
-  <div style="height: 25vh;"></div> <!-- Bottom 25% space -->
+  <div style="height: 30vh;"></div> <!-- Bottom 30% space -->
 </body>
 </html>
 )rawliteral";
@@ -211,19 +216,20 @@ void updateSensorDisplay() {
   float pressure = bmp.readPressure() / 100.0;  // Convert to hPa
   float dhtTemp = dht.readTemperature();
   float humidity = dht.readHumidity();
-
+  float altitude = bmp.readAltitude();
   display.clearDisplay();
   display.setCursor(0, 0);
-  display.println(F("~IoT Weather Station~"));
-  display.println(F("BMP180:"));
-  display.print(F("Temp: ")); display.print(bmpTemp); display.println(F(" C"));
-  display.print(F("Pres: ")); display.print(pressure); display.println(F(" hPa"));
-  display.println(F("DHT11:"));
-  if (isnan(dhtTemp) || isnan(humidity)) {
-    display.println(F("DHT11 Error"));
-  } else {
-    display.print(F("Temp: ")); display.print(dhtTemp); display.println(F(" C"));
-    display.print(F("Hum: ")); display.print(humidity); display.println(F(" %"));
-  }
+  display.println("IoT Weather Station");
+  display.println("---------------------");
+  display.print(F("BMP Temp: ")); display.print(bmpTemp); display.println(F(" C"));
+  display.print(F("Pressure: ")); display.print(pressure); display.println(F(" hPa"));
+  display.print(F("Altitude: ")); display.print(pressure); display.println(F(" m"));
+ // display.println(F("DHT11:"));
+  // if (isnan(dhtTemp) || isnan(humidity)) {
+  //   display.println(F("DHT11 Error"));
+  // } else {
+  display.print(F("DHT Temp: ")); display.print(dhtTemp); display.println(F(" C"));
+  display.print(F("DHT Hum: ")); display.print(humidity); display.println(F(" %"));
+  //}
   display.display();
 }
